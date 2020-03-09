@@ -2,9 +2,7 @@ package com.samhitha.myretail.controller
 
 import com.samhitha.myretail.domain.Product
 import com.samhitha.myretail.service.ProductService
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.client.HttpClientErrorException
 import spock.lang.Specification
 
 /**

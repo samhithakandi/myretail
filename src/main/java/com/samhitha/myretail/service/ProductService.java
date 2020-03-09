@@ -49,7 +49,6 @@ public class ProductService {
         ProductPricing productPricing;
         String title;
         try {
-            apiURL = "https://redsky.target.com/v2/pdp/tcin/%s?excludes=taxonomy,price,promotion,bulk_ship,rating_and_review_reviews,rating_and_review_statistics,question_answer_statistics";
             String apiURLWithProductId = String.format(apiURL, productId.toString());
             CompletableFuture<HttpResponse<String>> completableFuture = externalAPI.getAsyncResponse(apiURLWithProductId);
             productPricing = getFromMongo(productId.toString());

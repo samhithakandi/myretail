@@ -30,7 +30,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Override
     @Bean
     public MongoClient mongoClient() {
-        String connectionStringWithCredentials = String.format(connectionString,mongoUsername,mongoPassword);
+        String connectionStringWithCredentials = connectionString.replaceFirst("MONGO_USERNAME", mongoUsername).replaceFirst("MONGO_PASSWORD", mongoPassword);
         return MongoClients.create(connectionStringWithCredentials);
     }
 }
