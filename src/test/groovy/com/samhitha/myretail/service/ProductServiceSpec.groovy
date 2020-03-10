@@ -11,11 +11,14 @@ import spock.lang.Specification
 
 import java.net.http.HttpResponse
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionException
+import java.util.function.Function
 
 class ProductServiceSpec extends Specification {
 
     ExternalAPI externalAPI = Mock(ExternalAPI)
     ProductPricingRepository repository = Mock()
+    CompletableFuture completableFutureMock = Mock(CompletableFuture)
     def apiURL = "http://%s"
     ProductService productService = new ProductService(externalAPI: externalAPI,repository: repository, apiURL: apiURL)
 
@@ -70,12 +73,18 @@ class ProductServiceSpec extends Specification {
         System.setProperty("api.url", 'https://redsky.target.com/v2/pdp/tcin/%s?excludes=taxonomy,price,promotion,bulk_ship,rating_and_review_reviews,rating_and_review_statistics,question_answer_statistics')
         def productPricing = new ProductPricing("13860427", 30.5, "USD")
         def product = new Product(13860427, "Conan the Barbarian (dvd_video)", 30.5, "USD")
+        completableFutureMock.exceptionally(new Function<Throwable, String>() {
+            @Override
+            String apply(Throwable throwable) {
+                throw new CompletionException(throwable)
+            }
+        })
 
         when:
         def productResponse = productService.getProduct(13860427)
 
         then:
-        1 * externalAPI.getAsyncResponse(_) >> {throw new HttpClientErrorException(HttpStatus.NOT_FOUND)}
+        1 * externalAPI.getAsyncResponse(_) >> completableFutureMock
         1 * repository.findProductById('13860427') >> productPricing
         notThrown(HttpClientErrorException)
 
@@ -91,12 +100,18 @@ class ProductServiceSpec extends Specification {
         System.setProperty("api.url", 'https://redsky.target.com/v2/pdp/tcin/%s?excludes=taxonomy,price,promotion,bulk_ship,rating_and_review_reviews,rating_and_review_statistics,question_answer_statistics')
         def productPricing = new ProductPricing("13860427", 30.5, "USD")
         def product = new Product(13860427, "Conan the Barbarian (dvd_video)", 30.5, "USD")
+        completableFutureMock.exceptionally(new Function<Throwable, String>() {
+            @Override
+            String apply(Throwable throwable) {
+                throw new CompletionException(throwable)
+            }
+        })
 
         when:
         def productResponse = productService.getProduct(13860427)
 
         then:
-        1 * externalAPI.getAsyncResponse(_) >> {throw new HttpClientErrorException(HttpStatus.NOT_FOUND)}
+        1 * externalAPI.getAsyncResponse(_) >> completableFutureMock
         1 * repository.findProductById('13860427') >> {throw new MongoException("Mongo DB is down")}
         def e =thrown(HttpClientErrorException)
         e.statusCode.'4xxClientError'
