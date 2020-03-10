@@ -77,7 +77,7 @@ public class ProductService {
      */
     private ProductResponse handleAPIResponse(CompletableFuture<HttpResponse<String>> completableFuture) throws InterruptedException, ExecutionException {
         try {
-            String response = completableFuture.thenApply(HttpResponse::body).get();
+            String response = completableFuture.thenApply(HttpResponse::body).exceptionally(ex -> "Cannot get from API").get();
             ObjectMapper mapper = new ObjectMapper();
             ProductResponse productResponse = mapper.readValue(response, ProductResponse.class);
             if (productResponse.getProduct() != null && productResponse.getProduct().getItem() != null) {
@@ -88,6 +88,8 @@ public class ProductService {
                 }
             }
         } catch (IOException io) {
+            logger.error("Unable to process json from api", io);
+        } catch (Exception io) {
             logger.error("Unable to process json from api", io);
         }
         return null;
